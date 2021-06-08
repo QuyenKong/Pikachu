@@ -8,9 +8,9 @@ class BoardView : public Layer
 {
 	Board* board;
 
-	float squareSize, width, height;
+	float _squareSize, _width, _height;
 
-	std::vector<std::vector<Sprite*>> pokemons;
+	std::vector<std::vector<Sprite*>> _pokemons;
 
 public:
 

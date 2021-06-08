@@ -12,17 +12,17 @@ Layer* BoardView::createBoardView(Board* board)
 void BoardView::showBoard()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
-	squareSize = visibleSize.width / (board->getNColumns() + 5);
-	width = squareSize * board->getNColumns();
-	height = squareSize * board->getNRows();
-	setContentSize({ width, height });
+	_squareSize = visibleSize._width / (board->getNColumns() + 5);
+	_width = _squareSize * board->getNColumns();
+	_height = _squareSize * board->getNRows();
+	setContentSize({ _width, _height });
 
-	pokemons.resize(board->getNRows());
+	_pokemons.resize(board->getNRows());
 	for (int i = 0; i < board->getNRows(); ++i) {
-		pokemons[i].resize(board->getNColumns());
+		_pokemons[i].resize(board->getNColumns());
 		for (int j = 0; j < board->getNColumns(); ++j) {
-			pokemons[i][j] = addPokemon(i, j, board->getPokemon(i, j));
-			addChild(pokemons[i][j]);
+			_pokemons[i][j] = addPokemon(i, j, board->getPokemon(i, j));
+			addChild(_pokemons[i][j]);
 		}
 	}
 }
@@ -30,8 +30,8 @@ void BoardView::showBoard()
 Sprite* BoardView::addPokemon(int row, int column, int type)
 {
 	auto pokemon = Sprite::create("res/pokemons/" + std::to_string(type) + ".png");
-	pokemon->setScaleX(squareSize / pokemon->getContentSize().width);
-	pokemon->setScaleY(squareSize / pokemon->getContentSize().height);
+	pokemon->setScaleX(_squareSize / pokemon->getContentSize()._width);
+	pokemon->setScaleY(_squareSize / pokemon->getContentSize().height);
 	Vec2 position = positionOf(row, column);
 	pokemon->setPosition(position);
 
@@ -47,14 +47,14 @@ Sprite* BoardView::addPokemon(int row, int column, int type)
 
 Vec2 BoardView::positionOf(int row, int column)
 {
-	return Vec2(column * squareSize + squareSize / 2, height - row * squareSize - squareSize / 2);
+	return Vec2(column * _squareSize + _squareSize / 2, _height - row * _squareSize - _squareSize / 2);
 }
 
 std::pair<int, int> BoardView::findRowAndColumnOfSprite(Node* node)
 {
 	for (int i = 0; i < board->getNRows(); ++i) {
 		for (int j = 0; j < board->getNColumns(); ++j) {
-			if (pokemons[i][j] == node) {
+			if (_pokemons[i][j] == node) {
 				return { i, j };
 			}
 		}
@@ -64,9 +64,9 @@ std::pair<int, int> BoardView::findRowAndColumnOfSprite(Node* node)
 
 bool BoardView::removePokemon(int row, int column)
 {
-	if (pokemons[row][column] == nullptr) return false;
+	if (_pokemons[row][column] == nullptr) return false;
 	board->removePokemon(row, column);
-	pokemons[row][column] = nullptr;
+	_pokemons[row][column] = nullptr;
 	return true;
 }
 bool BoardView::onTouchPokemon(Touch* touch, Event* event) {
@@ -80,7 +80,7 @@ bool BoardView::onTouchPokemon(Touch* touch, Event* event) {
 			board->_x = board->_y = -1;
 		}
 		else {
-			createChoosePokemonEffect(pokemons[p.first][p.second]);
+			createChoosePokemonEffect(_pokemons[p.first][p.second]);
 			board->_x = p.first;
 			board->_y = p.second;
 		}
@@ -93,8 +93,8 @@ void BoardView::connectPokemons(int x, int y, int _x, int _y) {
 	auto connectEffect = getConnectEffect(x, y, _x, _y);
 
 	// 2: Hieu ung lam mo 2 pokemon
-	auto pokemonFade1 = TargetedAction::create(pokemons[x][y], FadeOut::create(0.5));
-	auto pokemonFade2 = TargetedAction::create(pokemons[_x][_y], FadeOut::create(0.5));
+	auto pokemonFade1 = TargetedAction::create(_pokemons[x][y], FadeOut::create(0.5));
+	auto pokemonFade2 = TargetedAction::create(_pokemons[_x][_y], FadeOut::create(0.5));
 	auto effectSpawn = Spawn::create(pokemonFade1, pokemonFade2, nullptr);
 
 	// 3: Xoa 2 pokemon
@@ -133,10 +133,10 @@ void BoardView::createChoosePokemonEffect(Node* pokemon)
 	emitter->setPosition(square.getMinX(), square.getMinY()); //Dat hieu ung ban dau o goc trai duoi pokemón
 
 	// Tao hieu ung particle chay quanh pokemon
-	auto moveUp = MoveBy::create(0.2, Vec2(0, squareSize));
-	auto moveRight = MoveBy::create(0.2, Vec2(squareSize, 0));
-	auto moveDown = MoveBy::create(0.2, Vec2(0, -squareSize));
-	auto moveLeft = MoveBy::create(0.2, Vec2(-squareSize, 0));
+	auto moveUp = MoveBy::create(0.2, Vec2(0, _squareSize));
+	auto moveRight = MoveBy::create(0.2, Vec2(_squareSize, 0));
+	auto moveDown = MoveBy::create(0.2, Vec2(0, -_squareSize));
+	auto moveLeft = MoveBy::create(0.2, Vec2(-_squareSize, 0));
 	auto sequence = RepeatForever::create(Sequence::create(moveUp, moveRight, moveDown, moveLeft, nullptr));
 	emitter->runAction(sequence);
 
